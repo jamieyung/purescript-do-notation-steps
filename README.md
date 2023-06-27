@@ -1,4 +1,4 @@
-### What is this for?
+# What is this for?
 
 Hopefully this will help with intuitively understanding do-notation.
 
@@ -8,7 +8,14 @@ There are 6 functions in there (ex1 to ex6) that are all logically equivalent an
 
 The first (ex1) is the most naive, and each subsequent function gradually improves on the syntax until we reach do-notation (ex6).
 
-### Some examples
+### Some relevant links
+
+https://www.youtube.com/watch?v=gHiyzctYqZ0&t=725s
+https://pursuit.purescript.org/packages/purescript-prelude/4.1.1/docs/Control.Bind
+https://stackoverflow.com/questions/8019670/desugaring-do-notation-for-monads
+https://en.wikibooks.org/wiki/Haskell/do_notation
+
+### Some examples of do-notation de-sugaring
 
 #### Ex1
 ```
