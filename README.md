@@ -10,10 +10,10 @@ The first (ex1) is the most naive, and each subsequent function gradually improv
 
 ### Some relevant links
 
-https://www.youtube.com/watch?v=gHiyzctYqZ0&t=725s
-https://pursuit.purescript.org/packages/purescript-prelude/4.1.1/docs/Control.Bind
-https://stackoverflow.com/questions/8019670/desugaring-do-notation-for-monads
-https://en.wikibooks.org/wiki/Haskell/do_notation
+- https://www.youtube.com/watch?v=gHiyzctYqZ0&t=725s
+- https://pursuit.purescript.org/packages/purescript-prelude/4.1.1/docs/Control.Bind
+- https://stackoverflow.com/questions/8019670/desugaring-do-notation-for-monads
+- https://en.wikibooks.org/wiki/Haskell/do_notation
 
 ### Some examples of do-notation de-sugaring
 
