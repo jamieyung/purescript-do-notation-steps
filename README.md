@@ -10,6 +10,7 @@ The first (ex1) is the most naive, and each subsequent function gradually improv
 
 ### Some relevant links
 
+- https://github.com/purescript/purescript-maybe/blob/v6.0.0/src/Data/Maybe.purs#L129
 - https://www.youtube.com/watch?v=gHiyzctYqZ0&t=725s
 - https://pursuit.purescript.org/packages/purescript-prelude/4.1.1/docs/Control.Bind
 - https://stackoverflow.com/questions/8019670/desugaring-do-notation-for-monads
