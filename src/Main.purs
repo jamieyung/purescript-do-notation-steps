@@ -11,61 +11,11 @@ import Effect (Effect)
 import Effect.Console (log)
 
 -------------------------------------------------------------------------------
--- Main -----------------------------------------------------------------------
+-- START READING HERE! --------------------------------------------------------
 -------------------------------------------------------------------------------
 
-main :: Effect Unit
-main = do
-    let aliceID = 1
-        bobID = 2
-        catID = 3
-        studentData =
-            { names: Map.fromFoldable
-                [ Tuple aliceID "Alice"
-                , Tuple bobID "Bob"
-                , Tuple catID "Cat"
-                ]
-            , ages: Map.fromFoldable
-                [ Tuple aliceID 30
-                , Tuple catID 25
-                ]
-            , heights: Map.fromFoldable
-                [ Tuple aliceID 165
-                , Tuple bobID 183
-                ]
-            }
-
-    log (show (getStudentInfo1 aliceID studentData)) -- Just "Alice 30 165"
-    log (show (getStudentInfo2 aliceID studentData)) -- Just "Alice 30 165"
-    log (show (getStudentInfo3 aliceID studentData)) -- Just "Alice 30 165"
-    log (show (getStudentInfo4 aliceID studentData)) -- Just "Alice 30 165"
-    log (show (getStudentInfo5 aliceID studentData)) -- Just "Alice 30 165"
-    log (show (getStudentInfo6 aliceID studentData)) -- Just "Alice 30 165"
-    log (show (getStudentInfo7 aliceID studentData)) -- Right "Alice 30 165"
-    log (show (getStudentInfo8 aliceID studentData)) -- Right "Alice 30 165"
-    log (show (getStudentInfo9 aliceID studentData)) -- Just "Alice 30 165"
-    log (show (getStudentInfo10 aliceID studentData)) -- Right "Alice 30 165"
-    log (show (getStudentInfo11 aliceID studentData)) -- Just "Alice 30 165"
-    log (show (getStudentInfo12 aliceID studentData)) -- Right "Alice 30 165"
-    log (show (getStudentInfo13 aliceID studentData)) -- Just "Alice 30 165"
-    log (show (getStudentInfo14 aliceID studentData)) -- Right "Alice 30 165"
-
-    -- in the `Maybe` implementation of `bind`, if there's ever a `Nothing`,
-    -- then the whole thing becomes `Nothing`. It's like an early-exit.
-    -- This prints out "Nothing" because there's no age record for Bob.
-    log (show (getStudentInfo1 bobID studentData))
-
-    -- Similarly, in the `Either` implementation of `bind`, if there's ever a
-    -- `Left`, then the whole thing becomes that `Left`. It's also like an
-    -- early-exit. These print out various error messages because they fail
-    -- at different stages.
-    log (show (getStudentInfo7 999 studentData)) -- Left "Name not found"
-    log (show (getStudentInfo7 bobID studentData)) -- Left "Age not found"
-    log (show (getStudentInfo7 catID studentData)) -- Left "Height not found"
-
--------------------------------------------------------------------------------
--- Types and utility functions ------------------------------------------------
--------------------------------------------------------------------------------
+-- In order to ground this example in something loosely resembling a real-world
+-- use-case, we introduce some simple data types and functions:
 
 type StudentData =
     { names :: Map ID String
@@ -83,10 +33,6 @@ getAge id sd = Map.lookup id sd.ages
 
 getHeight :: ID -> StudentData -> Maybe Int
 getHeight id sd = Map.lookup id sd.heights
-
--------------------------------------------------------------------------------
--- Keep reading! --------------------------------------------------------------
--------------------------------------------------------------------------------
 
 -- `getStudentInfo1` looks like a function you might see in a real codebase.
 -- Given an ID, it returns the name, age, and height of the associated student.
@@ -314,3 +260,56 @@ getStudentInfo14 id sd = do
     age <- getAgeE id sd
     height <- getHeightE id sd
     Right (name <> " " <> show age <> " " <> show height)
+
+-------------------------------------------------------------------------------
+-- Main -----------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+main :: Effect Unit
+main = do
+    let aliceID = 1
+        bobID = 2
+        catID = 3
+        studentData =
+            { names: Map.fromFoldable
+                [ Tuple aliceID "Alice"
+                , Tuple bobID "Bob"
+                , Tuple catID "Cat"
+                ]
+            , ages: Map.fromFoldable
+                [ Tuple aliceID 30
+                , Tuple catID 25
+                ]
+            , heights: Map.fromFoldable
+                [ Tuple aliceID 165
+                , Tuple bobID 183
+                ]
+            }
+
+    log (show (getStudentInfo1 aliceID studentData)) -- Just "Alice 30 165"
+    log (show (getStudentInfo2 aliceID studentData)) -- Just "Alice 30 165"
+    log (show (getStudentInfo3 aliceID studentData)) -- Just "Alice 30 165"
+    log (show (getStudentInfo4 aliceID studentData)) -- Just "Alice 30 165"
+    log (show (getStudentInfo5 aliceID studentData)) -- Just "Alice 30 165"
+    log (show (getStudentInfo6 aliceID studentData)) -- Just "Alice 30 165"
+    log (show (getStudentInfo7 aliceID studentData)) -- Right "Alice 30 165"
+    log (show (getStudentInfo8 aliceID studentData)) -- Right "Alice 30 165"
+    log (show (getStudentInfo9 aliceID studentData)) -- Just "Alice 30 165"
+    log (show (getStudentInfo10 aliceID studentData)) -- Right "Alice 30 165"
+    log (show (getStudentInfo11 aliceID studentData)) -- Just "Alice 30 165"
+    log (show (getStudentInfo12 aliceID studentData)) -- Right "Alice 30 165"
+    log (show (getStudentInfo13 aliceID studentData)) -- Just "Alice 30 165"
+    log (show (getStudentInfo14 aliceID studentData)) -- Right "Alice 30 165"
+
+    -- in the `Maybe` implementation of `bind`, if there's ever a `Nothing`,
+    -- then the whole thing becomes `Nothing`. It's like an early-exit.
+    -- This prints out "Nothing" because there's no age record for Bob.
+    log (show (getStudentInfo1 bobID studentData))
+
+    -- Similarly, in the `Either` implementation of `bind`, if there's ever a
+    -- `Left`, then the whole thing becomes that `Left`. It's also like an
+    -- early-exit. These print out various error messages because they fail
+    -- at different stages.
+    log (show (getStudentInfo7 999 studentData)) -- Left "Name not found"
+    log (show (getStudentInfo7 bobID studentData)) -- Left "Age not found"
+    log (show (getStudentInfo7 catID studentData)) -- Left "Height not found"
