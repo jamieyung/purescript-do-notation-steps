@@ -4,10 +4,6 @@ Hopefully this will help with intuitively understanding do-notation.
 
 See `src/Main.purs`, which has examples and explanations.
 
-There are 6 functions in there (ex1 to ex6) that are all logically equivalent and only differ in syntax.
-
-The first (ex1) is the most naive, and each subsequent function gradually improves on the syntax until we reach do-notation (ex6).
-
 ### Some relevant links
 
 - https://github.com/purescript/purescript-maybe/blob/v6.0.0/src/Data/Maybe.purs#L129
