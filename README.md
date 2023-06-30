@@ -4,6 +4,12 @@ Hopefully this will help with intuitively understanding do-notation.
 
 See `src/Main.purs`, which has examples and explanations.
 
+### Running the examples
+
+```
+spago run
+```
+
 ### Some relevant links
 
 - https://github.com/purescript/purescript-maybe/blob/v6.0.0/src/Data/Maybe.purs#L129
