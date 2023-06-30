@@ -10,9 +10,9 @@ import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Effect.Console (log)
 
--------------------------------------------------------------------------------
--- START READING HERE! --------------------------------------------------------
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- START READING HERE! ---------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- In order to ground this example in something loosely resembling a real-world
 -- use-case, we introduce some simple data types and functions:
@@ -37,10 +37,12 @@ getHeight id sd = Map.lookup id sd.heights
 -- `getStudentInfo1` looks like a function you might see in a real codebase.
 -- Given an ID, it returns the name, age, and height of the associated student.
 -- For now, let's ignore the fact that this function isn't THAT useful; it's
--- only for the purpose of building towards an intuition for how do-notation works!
+-- only for the purpose of building towards an intuition for how do-notation
+-- works!
 -- Notice how this function does the job, but it's a bit messy and verbose:
--- The line `Nothing -> Nothing` is repeated three times, and if you wanted to add
--- more to this function, the indentation level would get out of hand pretty quick.
+-- The line `Nothing -> Nothing` is repeated three times, and if you wanted to
+-- add more to this function, the indentation level would get out of hand
+-- pretty quick.
 getStudentInfo1 :: ID -> StudentData -> Maybe String
 getStudentInfo1 id sd = case getName id sd of
     Nothing -> Nothing
@@ -50,17 +52,18 @@ getStudentInfo1 id sd = case getName id sd of
             Nothing -> Nothing
             Just height -> Just (name <> " " <> show age <> " " <> show height)
 
--- Notice how the structure of `getStudentInfo1` is repetitive: if we have `Nothing`
--- we return `Nothing`, otherwise do something else with the value inside the `Just`.
--- This pattern repeats three times. We can extract this pattern out by writing a
--- helper function that handles this piping logic:
+-- Notice how the structure of `getStudentInfo1` is repetitive: if we have
+-- `Nothing` we return `Nothing`, otherwise do something else with the value
+-- inside the `Just`. This pattern repeats three times. We can extract this
+-- pattern out by writing a helper function that handles this piping logic:
 pipeMaybe :: forall a b. Maybe a -> (a -> Maybe b) -> Maybe b
 pipeMaybe Nothing _ = Nothing
 pipeMaybe (Just v) f = f v
 
--- Now we can re-write `getStudentInfo1` using `pipeMaybe`, giving `getStudentInfo2`
--- below. You may think it looks worse, but we'll gradually improve the syntax over
--- the next few examples. The important bit is that the explicit piping logic is gone.
+-- Now we can re-write `getStudentInfo1` using `pipeMaybe`, giving
+-- `getStudentInfo2` below. You may think it looks worse, but we'll gradually
+-- improve the syntax over the next few examples. The important bit is that the
+-- explicit piping logic is gone.
 getStudentInfo2 :: ID -> StudentData -> Maybe String
 getStudentInfo2 id sd =
     pipeMaybe (getName id sd) (\name ->
@@ -104,16 +107,18 @@ getStudentInfo6 id sd =
     getHeight id sd |> \height ->
     Just (name <> " " <> show age <> " " <> show height)
 
--- Pretty good! The function still behaves as before (ie. it early-exits with `Nothing`
--- if there's a `Nothing` at any stage), but it's easier to read, and it's easily
--- extensible (if we needed to add another stage, just add it on a new line).
+-- Pretty good! The function still behaves as before (ie. it early-exits with
+-- `Nothing` if there's a `Nothing` at any stage), but it's easier to read, and
+-- it's easily extensible (if we needed to add another stage, just add it on a
+-- new line).
 
 -- But it could still be better; currently if something goes wrong,
--- there's no way of telling WHERE it went wrong because only a `Nothing` is returned.
--- The standard approach for returning information in an error case is to use `Either`
--- instead of `Maybe`.
--- Let's introduce some more types and basic functions (same as the ones above, but
--- with an "E" suffix for "Either". Naming stuff is hard):
+-- there's no way of telling WHERE it went wrong because only a `Nothing` is
+-- returned (which carries no information other than the fact that something
+-- went wrong). The standard approach for returning information in an error case
+-- is to use `Either` instead of `Maybe`.
+-- Let's introduce some more types and basic functions (same as the ones above,
+-- but with an "E" suffix for "Either". Naming stuff is hard):
 
 type Error = String
 
@@ -142,15 +147,16 @@ getStudentInfo7 id sd = case getNameE id sd of
             Left e -> Left e
             Right height -> Right (name <> " " <> show age <> " " <> show height)
 
--- Now we can write a pipe function again like we did with Maybe, but this time for Either:
+-- Now we can write a pipe function again like we did with Maybe, but this time
+-- for Either:
 pipeEither :: forall e a b. Either e a -> (a -> Either e b) -> Either e b
 pipeEither (Left e) _ = Left e
 pipeEither (Right v) f = f v
 
 infixl 1 pipeEither as |>>
 
--- Now using pipeEither (and applying the newlines, parens, indentation, and infix
--- syntax enhancements):
+-- Now using pipeEither (and applying the newlines, parens, indentation, and
+-- infix syntax enhancements):
 getStudentInfo8 :: ID -> StudentData -> Either Error String
 getStudentInfo8 id sd =
     getNameE id sd |>> \name ->
@@ -158,30 +164,31 @@ getStudentInfo8 id sd =
     getHeightE id sd |>> \height ->
     Right (name <> " " <> show age <> " " <> show height)
 
--- This is better, but you can see how this would get annoying and repetitive quickly.
--- Each time we want to pipe functions together using a new container type, you have
--- to define a new pipe function, and come up with a new symbol combination for the
--- infix operator. If only there was a way to do this piping logic generically for
--- any type...
+-- This is better, but you can see how this would get annoying and repetitive
+-- quickly. Each time we want to pipe functions together using a new container
+-- type, you have to define a new pipe function, and come up with a new symbol
+-- combination for the infix operator. If only there was a way to do this piping
+-- logic generically for any type...
 
--- This can be done using type classes! These are a lot like interfaces from Go or other
--- imperative languages.
+-- This can be done using type classes! These are a lot like interfaces from Go
+-- or other imperative languages.
 
 -- We define a type class called `Pipe`, essentially a contract which requires a
 -- single function called `pipe`:
 class Pipe m where
     pipe :: forall a b. m a -> (a -> m b) -> m b
 
--- Notice how the `pipe` function's type signature is similar to the signature of
--- `pipeMaybe` and `pipeEither`:
+-- Notice how the `pipe` function's type signature is similar to the signature
+-- of `pipeMaybe` and `pipeEither`:
 --
 -- pipe       :: forall a b.   m a        -> (a -> m b)        -> m b
 -- pipeMaybe  :: forall a b.   Maybe a    -> (a -> Maybe b)    -> Maybe b
 -- pipeEither :: forall a b e. Either e a -> (a -> Either e b) -> Either e b
 --
--- The only difference is that the concrete types `Maybe` and `Either` have been stripped
--- out, and replaced with a generic type variable `m`. Now the specific behaviour of the
--- `pipe` function is determined by each type's implementation of the `pipe` function:
+-- The only difference is that the concrete types `Maybe` and `Either` have been
+-- stripped out, and replaced with a generic type variable `m`. Now the specific
+-- behaviour of the `pipe` function is determined by each type's implementation
+-- of the `pipe` function:
 instance Pipe Maybe where
     pipe Nothing _ = Nothing
     pipe (Just v) f = f v
@@ -190,9 +197,10 @@ instance Pipe (Either a) where
     pipe (Left v) _ = (Left v)
     pipe (Right v) f = f v
 
--- Now we can re-write the implementations using `pipe` instead of the specific pipe
--- functions, and it will work for both `Maybe` and `Either`, using the correct implementation
--- of the `pipe` function as defined in the instances above!
+-- Now we can re-write the implementations using `pipe` instead of the specific
+-- pipe functions, and it will work for both `Maybe` and `Either`, using the
+-- correct implementation of the `pipe` function as defined in the instances
+-- above!
 
 infixl 1 pipe as >>==
 
@@ -213,8 +221,9 @@ getStudentInfo10 id sd =
 -- It turns out that there's already a function that does the job of `pipe`.
 -- It's called `bind`, and it looks like this: `>>=`.
 -- Definition: bind :: forall a b. m a -> (a -> m b) -> m b
--- The two examples below work because `Maybe` and `Either` already have a `bind`
--- instance defined!
+-- 
+-- The two examples below (`getStudentInfo11` and `getStudentInfo12`) work
+-- because `Maybe` and `Either` already have a `bind` instance defined!
 --
 -- https://github.com/purescript/purescript-maybe/blob/v6.0.0/src/Data/Maybe.purs#L125
 -- instance bindMaybe :: Bind Maybe where
@@ -225,8 +234,8 @@ getStudentInfo10 id sd =
 -- instance bindEither :: Bind (Either e) where
 --   bind = either (\e _ -> Left e) (\a f -> f a)
 --
--- These next two implementations are pretty much exactly the same as the implementations for
--- `pipe` above, which makes sense.
+-- These next two implementations are pretty much exactly the same as the
+-- implementations for `pipe` above, which makes sense.
 getStudentInfo11 :: ID -> StudentData -> Maybe String
 getStudentInfo11 id sd =
     getName id sd >>= \name ->
@@ -261,9 +270,9 @@ getStudentInfo14 id sd = do
     height <- getHeightE id sd
     Right (name <> " " <> show age <> " " <> show height)
 
--------------------------------------------------------------------------------
--- Main -----------------------------------------------------------------------
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Main ------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 main :: Effect Unit
 main = do
